@@ -42,13 +42,13 @@ jobs:
     - name: Run mypy and save output
       if: env.MODIFIED_FILES != ''
       run: |
-        echo "${{ env.MODIFIED_FILES }}" | xargs mypy --ignore-missing-imports --disallow-untyped-defs > mypy_output.txt 2>&1
+        echo "${{ env.MODIFIED_FILES }}" | xargs -d '\n' mypy --ignore-missing-imports --disallow-untyped-defs > mypy_output.txt 2>&1
       continue-on-error: true
 
     - name: Run pydocstyle and save output
       if: env.MODIFIED_FILES != ''
       run: |
-        echo "${{ env.MODIFIED_FILES }}" | xargs pydocstyle > pydocstyle_output.txt 2>&1
+        echo "${{ env.MODIFIED_FILES }}" | xargs -d '\n' pydocstyle > pydocstyle_output.txt 2>&1
       continue-on-error: true
 
     - name: Set script permissions
