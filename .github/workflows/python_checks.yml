@@ -11,6 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Fetch base and head branches
+      run: |
+        git fetch --no-tags --depth=1 origin +${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+        git fetch --no-tags --depth=1 origin +${{ github.head_ref }}:refs/remotes/origin/${{ github.head_ref }}
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -20,14 +26,29 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install mypy pydocstyle requests
+        pip install mypy pydocstyle requests types-requests
+
+    - name: Find modified Python files
+      run: |
+        echo "MODIFIED_FILES<<EOF" >> $GITHUB_ENV
+        git diff --name-only refs/remotes/origin/${{ github.base_ref }} $(git merge-base refs/remotes/origin/${{ github.base_ref }} refs/remotes/origin/${{ github.head_ref }}) | grep '\.py$' >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+    - name: Echo modified Python files
+      run: |
+        echo "Modified Python files:"
+        echo "${{ env.MODIFIED_FILES }}"
 
     - name: Run mypy and save output
-      run: mypy --ignore-missing-imports --disallow-untyped-defs . > mypy_output.txt 2>&1
+      if: env.MODIFIED_FILES != ''
+      run: |
+        echo "${{ env.MODIFIED_FILES }}" | xargs mypy --ignore-missing-imports --disallow-untyped-defs > mypy_output.txt 2>&1
       continue-on-error: true
 
     - name: Run pydocstyle and save output
-      run: pydocstyle . > pydocstyle_output.txt 2>&1
+      if: env.MODIFIED_FILES != ''
+      run: |
+        echo "${{ env.MODIFIED_FILES }}" | xargs pydocstyle > pydocstyle_output.txt 2>&1
       continue-on-error: true
 
     - name: Set script permissions
