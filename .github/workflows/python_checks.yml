@@ -23,7 +23,7 @@ jobs:
         pip install mypy pydocstyle requests
 
     - name: Run mypy and save output
-      run: mypy --ignore-missing-imports . > mypy_output.txt 2>&1
+      run: mypy --ignore-missing-imports --disallow-untyped-defs . > mypy_output.txt 2>&1
       continue-on-error: true
 
     - name: Run pydocstyle and save output
