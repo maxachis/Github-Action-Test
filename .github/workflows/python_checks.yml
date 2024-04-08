@@ -2,6 +2,10 @@ name: Python Checks
 
 on: [pull_request]
 
+permissions:
+  issues: write
+  pull-requests: write
+
 jobs:
   type_and_docstring_check:
     runs-on: ubuntu-latest
