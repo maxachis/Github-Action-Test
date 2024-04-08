@@ -48,7 +48,7 @@ jobs:
     - name: Run pydocstyle and save output
       if: env.MODIFIED_FILES != ''
       run: |
-        pydocstyle ${{ env.MODIFIED_FILES }} > pydocstyle_output.txt 2>&1
+        echo "${{ env.MODIFIED_FILES }}" | xargs pydocstyle > pydocstyle_output.txt 2>&1
       continue-on-error: true
 
     - name: Set script permissions
