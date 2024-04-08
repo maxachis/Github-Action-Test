@@ -29,25 +29,24 @@ jobs:
         pip install mypy pydocstyle requests
 
     - name: Find modified Python files
-      id: modified_files
       run: |
-        echo "::set-output name=files::$(git diff --name-only refs/remotes/origin/${{ github.base_ref }} $(git merge-base refs/remotes/origin/${{ github.base_ref }} refs/remotes/origin/${{ github.head_ref }}) | grep '\.py$')"
+        echo "MODIFIED_FILES=$(git diff --name-only refs/remotes/origin/${{ github.base_ref }} $(git merge-base refs/remotes/origin/${{ github.base_ref }} refs/remotes/origin/${{ github.head_ref }}) | grep '\.py$')" >> $GITHUB_ENV
 
     - name: Echo modified Python files
       run: |
         echo "Modified Python files:"
-        echo "${{ steps.modified_files.outputs.files }}"
+        echo "${{ env.MODIFIED_FILES }}"
 
     - name: Run mypy and save output
-      if: steps.modified_files.outputs.files != ''
+      if: env.MODIFIED_FILES != ''
       run: |
-        echo "${{ steps.modified_files.outputs.files }}" | xargs mypy --ignore-missing-imports --disallow-untyped-defs > mypy_output.txt 2>&1
+        echo "${{ env.MODIFIED_FILES }}" | xargs mypy --ignore-missing-imports --disallow-untyped-defs > mypy_output.txt 2>&1
       continue-on-error: true
 
     - name: Run pydocstyle and save output
-      if: steps.modified_files.outputs.files != ''
+      if: env.MODIFIED_FILES != ''
       run: |
-        echo "${{ steps.modified_files.outputs.files }}" | xargs pydocstyle > pydocstyle_output.txt 2>&1
+        echo "${{ env.MODIFIED_FILES }}" | xargs pydocstyle > pydocstyle_output.txt 2>&1
       continue-on-error: true
 
     - name: Set script permissions
