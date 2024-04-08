@@ -42,7 +42,7 @@ jobs:
     - name: Run mypy and save output
       if: env.MODIFIED_FILES != ''
       run: |
-        mypy --ignore-missing-imports --disallow-untyped-defs ${{ env.MODIFIED_FILES }} > mypy_output.txt 2>&1
+        echo "${{ env.MODIFIED_FILES }}" | xargs mypy --ignore-missing-imports --disallow-untyped-defs > mypy_output.txt 2>&1
       continue-on-error: true
 
     - name: Run pydocstyle and save output
