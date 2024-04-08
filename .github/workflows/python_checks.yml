@@ -22,12 +22,22 @@ jobs:
         python -m pip install --upgrade pip
         pip install mypy pydocstyle requests
 
+    - name: Find modified Python files
+      id: modified_files
+      run: |
+        echo "MODIFIED_FILES<<EOF" >> $GITHUB_ENV
+        git diff --name-only ${{ github.base_ref }} ${{ github.head_ref }} | grep '\.py$'
+        echo "EOF" >> $GITHUB_ENV
+
     - name: Run mypy and save output
-      run: mypy --ignore-missing-imports --disallow-untyped-defs . > mypy_output.txt 2>&1
+      if: env.MODIFIED_FILES != ''
+      run: |
+        mypy --ignore-missing-imports --disallow-untyped-defs ${{ env.MODIFIED_FILES }} > mypy_output.txt 2>&1
       continue-on-error: true
 
     - name: Run pydocstyle and save output
-      run: pydocstyle . > pydocstyle_output.txt 2>&1
+      if: env.MODIFIED_FILES != ''
+      run: pydocstyle ${{ env.MODIFIED_FILES }} > pydocstyle_output.txt 2>&1
       continue-on-error: true
 
     - name: Set script permissions
