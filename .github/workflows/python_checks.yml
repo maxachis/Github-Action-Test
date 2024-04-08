@@ -36,7 +36,7 @@ jobs:
     - name: Echo modified Python files
       run: |
         echo "Modified Python files:"
-        echo "${{ env.MODIFIED_FILES }}"
+        echo "${{ steps.modified_files.outputs.files }}"
 
     - name: Run mypy and save output
       if: steps.modified_files.outputs.files != ''
@@ -45,7 +45,7 @@ jobs:
       continue-on-error: true
 
     - name: Run pydocstyle and save output
-      if: env.MODIFIED_FILES != ''
+      if: steps.modified_files.outputs.files != ''
       run: |
         echo "${{ steps.modified_files.outputs.files }}" | xargs pydocstyle > pydocstyle_output.txt 2>&1
       continue-on-error: true
