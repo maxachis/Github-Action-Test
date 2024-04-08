@@ -13,6 +13,8 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: Fetch base branch
+      run: git fetch --depth=1 origin ${{ github.base_ref }}:${{ github.base_ref }}
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -28,7 +30,7 @@ jobs:
       id: modified_files
       run: |
         echo "MODIFIED_FILES<<EOF" >> $GITHUB_ENV
-        git diff --name-only ${{ github.base_ref }} ${{ github.head_ref }} | grep '\.py$'
+        git diff --name-only FETCH_HEAD $(git merge-base FETCH_HEAD ${{ github.head_ref }}) | grep '\.py$'
         echo "EOF" >> $GITHUB_ENV
 
     - name: Run mypy and save output
