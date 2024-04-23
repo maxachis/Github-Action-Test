@@ -1,17 +1,23 @@
-name: reviewdog
+name: flake8 Lint
+
 on: [pull_request]
+
 jobs:
-  pylint:
-    name: runner / pylint
+  flake8-lint:
     runs-on: ubuntu-latest
+    name: Lint
     steps:
-      - uses: actions/checkout@v2
-      - uses: dciborow/action-pylint@0.1.0
+      - name: Check out source repository
+        uses: actions/checkout@v2
+      - name: Set up Python environment
+        uses: actions/setup-python@v2
         with:
-          github_token: ${{ secrets.github_token }}
-          # Change reviewdog reporter if you need [github-pr-check,github-check,github-pr-review].
-          reporter: github-pr-review
-          # Change reporter level if you need.
-          # GitHub Status Check won't become failure with warning.
-          level: warning
-          glob_pattern: "**/*.py"
+          python-version: "3.11"
+      # Install specific flake8 version (this step is not required. Default is "latest").
+      - run: pip install flake8
+      # Install flake8 extensions (this step is not required. Default is "None").
+      - run: pip install flake8-docstrings flake8-simplify flake8-unused-arguments flake8-quotes
+      - name: flake8 Lint
+        uses: reviewdog/action-flake8@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
