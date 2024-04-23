@@ -1,32 +1,33 @@
 name: Lint
 
 on:  # yamllint disable-line rule:truthy
-  push: null
-  pull_request: null
+  pull_request:
 
 permissions: { }
 
 jobs:
-  build:
-    name: Lint
+  flake8:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      packages: read
-      # To report GitHub Actions status checks
-      statuses: write
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          # super-linter needs the full git history to get the
-          # list of files that changed across commits
-          fetch-depth: 0
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'  # Specify the Python version
 
-      - name: Super-linter
-        uses: super-linter/super-linter@v6.4.1  # x-release-please-version
-        env:
-          # To report GitHub Actions status checks
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Install flake8
+      run: pip install flake8
+
+    - name: Run flake8
+      run: flake8 . --output-file=flake8-report.txt
+
+    - name: Upload flake8 report as an artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: flake8-report
+        path: flake8-report.txt
+    - name: Run flake8 with reviewdog
+      uses: reviewdog/action-flake8@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        reporter: github-pr-review  # This reports the results as PR review comments
