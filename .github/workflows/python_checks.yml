@@ -1,33 +1,17 @@
-name: Lint
-
-on:  # yamllint disable-line rule:truthy
-  pull_request:
-
-permissions: { }
-
+name: reviewdog
+on: [pull_request]
 jobs:
-  flake8:
+  pylint:
+    name: runner / pylint
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.11'  # Specify the Python version
-
-    - name: Install flake8
-      run: pip install flake8
-
-    - name: Run flake8
-      run: flake8 . --output-file=flake8-report.txt
-
-    - name: Upload flake8 report as an artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: flake8-report
-        path: flake8-report.txt
-    - name: Run flake8 with reviewdog
-      uses: reviewdog/action-flake8@v1
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        reporter: github-pr-review  # This reports the results as PR review comments
+      - uses: actions/checkout@v2
+      - uses: dciborow/action-pylint@0.1.0
+        with:
+          github_token: ${{ secrets.github_token }}
+          # Change reviewdog reporter if you need [github-pr-check,github-check,github-pr-review].
+          reporter: github-pr-review
+          # Change reporter level if you need.
+          # GitHub Status Check won't become failure with warning.
+          level: warning
+          glob_pattern: "**/*.py"
