@@ -16,7 +16,7 @@ jobs:
       # Install specific flake8 version (this step is not required. Default is "latest").
       - run: pip install flake8
       # Install flake8 extensions (this step is not required. Default is "None").
-      - run: pip install flake8-docstrings flake8-simplify flake8-unused-arguments flake8-quotes
+      - run: pip install flake8-docstrings flake8-simplify flake8-unused-arguments flake8-quotes flake8-annotations
       - name: flake8 Lint
         uses: reviewdog/action-flake8@v3
         with:
