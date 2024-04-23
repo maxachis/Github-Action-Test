@@ -15,3 +15,4 @@ jobs:
       - uses: TrueBrain/actions-flake8@v2
         with:
           only_warn: 1
+          plugins: "flake8-docstrings"
